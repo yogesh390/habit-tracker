@@ -7,27 +7,31 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  lint-test-deploy:
+  lint:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
-      - name: Validate HTML
-        uses: svenstaro/html5validator-action@v0.7.0
-        with:
-          root: "."
+      - name: Run HTML Validator
+        uses: Cyb3r-Jak3/html5validator-action@v1
 
-      # ✅ CSS Validation using W3C CSS Validator
-      - name: Validate CSS
-        run: |
-          curl -sL https://jigsaw.w3.org/css-validator/validator \
-          -F file=@./styles.css -F warning=0
+      - name: Run CSS Validator
+        uses: chrislennon/action-css-validator@v1.1.0
 
-      # ✅ Deploy to GitHub Pages
+  deploy:
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
