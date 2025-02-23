@@ -21,12 +21,12 @@ document.addEventListener("DOMContentLoaded", () => {
     messageElement.classList.add("message");
     messageElement.innerHTML = `<strong>${sender}:</strong> ${message}`;
     chatbotMessages.appendChild(messageElement);
-    chatbotMessages.scrollTop = chatbotMessages.scrollHeight; // Auto-scroll to latest message
+    chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
   }
 
   async function getAIResponse(prompt) {
     const apiKey =
-      "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"; // Store securely
+      "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";
     try {
       const response = await fetch(
         "https://openrouter.ai/api/v1/chat/completions",
@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            model: "google/learnlm-1.5-pro-experimental:free", // Check model ID
+            model: "google/gemini-2.0-flash-lite-preview-02-05:free",
             messages: [{ role: "user", content: prompt }],
             temperature: 0.7,
           }),
