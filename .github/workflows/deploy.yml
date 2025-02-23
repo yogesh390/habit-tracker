@@ -7,16 +7,36 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  deploy:
+  lint:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Run HTML Validator
+        uses: Cyb3r-Jak3/html5validator-action@v1.5.0
+        with:
+          root: .
+
+      - name: Run CSS Validator
+        uses: chrislennon/action-css-validator@v1
+        with:
+          folder: "."
+
+  deploy:
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
         uses: actions/checkout@v3
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./
+          publish_dir: .
