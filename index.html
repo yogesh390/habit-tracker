@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Habit Tracker</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+</head>
+
+<body>
+    <h1>Habit Tracker</h1>
+    <form id="add-habit-form">
+        <input type="text" id="habit-name" placeholder="Enter habit name" required />
+        <button type="submit">Add Habit</button>
+    </form>
+
+    <h2>Your Habits</h2>
+    <div id="filters">
+        <button onclick="filterHabits('all')">All Habits</button>
+        <button onclick="filterHabits('completed')">Completed Today</button>
+        <button onclick="filterHabits('pending')">Pending Habits</button>
+    </div>
+    <ul id="habit-list"></ul>
+
+    <button id="chatbot-toggle">💬 Chat with AI</button>
+    <div id="chatbot-container" style="display: none;">
+        <div id="chatbot-header">
+            <h2>Habit Tracker AI</h2>
+            <button id="chatbot-close">&times;</button>
+        </div>
+        <div id="chatbot-messages"></div>
+        <div id="chatbot-input">
+            <input type="text" id="chatInput" placeholder="Ask me anything..." />
+            <button id="sendChat">Send</button>
+        </div>
+    </div>
+
+    <div id="loading-indicator" style="display: none;">Loading...</div>
+
+    <button id="register-biometric">Register Biometric</button>
+    <button id="authenticate-biometric">Login with Biometric</button>
+
+    <script src="script.js"></script>
+    <script src="biometric.js"></script>
+    <script src="chatbot-script.js"></script>
+</body>
+
+</html>
