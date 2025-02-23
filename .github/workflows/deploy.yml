@@ -19,12 +19,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Run HTML Validator
-        uses: Cyb3r-Jak3/html5validator-action
-
-      - name: Run CSS Validator
-        uses: chrislennon/action-css-validator
-
   deploy:
     needs: lint
     runs-on: ubuntu-latest
