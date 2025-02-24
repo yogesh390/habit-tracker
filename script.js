@@ -13,6 +13,17 @@ import {
 const habitList = document.getElementById("habit-list");
 let currentFilter = "all"; // Default filter
 
+auth.onAuthStateChanged((user) => {
+  if (user) {
+    // User is signed in, load habits
+    loadHabits();
+  } else {
+    // User is signed out
+    document.getElementById("app-content").style.display = "none";
+    document.getElementById("login-ui").style.display = "block";
+  }
+});
+
 // Function to fetch and display habits for the authenticated user
 async function loadHabits() {
   habitList.innerHTML = "";

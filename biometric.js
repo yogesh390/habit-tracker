@@ -7,14 +7,13 @@ export async function registerBiometric() {
     return;
   }
 
-  // In a real-world app, the challenge and user ID should come from your server.
   const publicKey = {
     challenge: Uint8Array.from("random-challenge", (c) => c.charCodeAt(0)),
     rp: { name: "Habit Tracker" },
     user: {
       id: Uint8Array.from("unique-user-id", (c) => c.charCodeAt(0)),
       name: "user@example.com", // Replace with dynamic user info
-      displayName: "User",
+      displayName: "User ",
     },
     pubKeyCredParams: [{ type: "public-key", alg: -7 }], // Using ES256
     timeout: 60000,
@@ -25,10 +24,9 @@ export async function registerBiometric() {
     const credential = await navigator.credentials.create({ publicKey });
     console.log("Credential created:", credential);
     alert("Biometric registration successful!");
-    // In a real application, send the credential to your server for verification/storage.
 
-    // Auto-login after successful registration (mimicking "continue with Google")
-    await authenticateBiometric();
+    // Directly log in the user after registration
+    handleSuccessfulLogin();
   } catch (error) {
     console.error("Error during biometric registration:", error);
     alert("Biometric registration failed.");
@@ -42,14 +40,12 @@ export async function authenticateBiometric() {
     return;
   }
 
-  // In production, your server should provide the proper challenge and allowed credential IDs.
   const publicKey = {
     challenge: Uint8Array.from("random-challenge", (c) => c.charCodeAt(0)),
     timeout: 60000,
     allowCredentials: [
       {
         type: "public-key",
-        // Replace with the credential ID stored during registration
         id: Uint8Array.from("credential-id", (c) => c.charCodeAt(0)),
       },
     ],
@@ -60,8 +56,6 @@ export async function authenticateBiometric() {
     const assertion = await navigator.credentials.get({ publicKey });
     console.log("Assertion received:", assertion);
     alert("Biometric authentication successful!");
-    // Send the assertion to your server for verification here.
-    // On successful verification, update the application state to "logged in":
     handleSuccessfulLogin();
   } catch (error) {
     console.error("Error during biometric authentication:", error);
@@ -69,9 +63,8 @@ export async function authenticateBiometric() {
   }
 }
 
-// Handle successful login, e.g., update UI or trigger Firebase sign-in
+// Handle successful login
 function handleSuccessfulLogin() {
-  // Example: hide the login/register UI and display the main app content.
   document.getElementById("app-content").style.display = "block";
   document.getElementById("login-ui").style.display = "none";
   // Optionally, integrate with Firebase Authentication here.
