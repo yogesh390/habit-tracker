@@ -10,37 +10,43 @@
 </head>
 
 <body>
-    <h1>Habit Tracker</h1>
-    <form id="add-habit-form">
-        <input type="text" id="habit-name" placeholder="Enter habit name" required />
-        <button type="submit">Add Habit</button>
-    </form>
-
-    <h2>Your Habits</h2>
-    <div id="filters">
-        <button onclick="filterHabits('all')">All Habits</button>
-        <button onclick="filterHabits('completed')">Completed Today</button>
-        <button onclick="filterHabits('pending')">Pending Habits</button>
-    </div>
-    <ul id="habit-list"></ul>
-
-    <button id="chatbot-toggle">💬 Chat with AI</button>
-    <div id="chatbot-container" style="display: none;">
-        <div id="chatbot-header">
-            <h2>Habit Tracker AI</h2>
-            <button id="chatbot-close">&times;</button>
-        </div>
-        <div id="chatbot-messages"></div>
-        <div id="chatbot-input">
-            <input type="text" id="chatInput" placeholder="Ask me anything..." />
-            <button id="sendChat">Send</button>
-        </div>
+    <!-- Authentication UI (shown when the user is not logged in) -->
+    <div id="login-ui">
+        <button id="register-biometric">Register Biometric</button>
+        <button id="authenticate-biometric">Login with Biometric</button>
     </div>
 
-    <div id="loading-indicator" style="display: none;">Loading...</div>
+    <!-- App Content (shown when the user is authenticated) -->
+    <div id="app-content" style="display: none;">
+        <h1>Habit Tracker</h1>
+        <form id="add-habit-form">
+            <input type="text" id="habit-name" placeholder="Enter habit name" required />
+            <button type="submit">Add Habit</button>
+        </form>
 
-    <button id="register-biometric">Register Biometric</button>
-    <button id="authenticate-biometric">Login with Biometric</button>
+        <h2>Your Habits</h2>
+        <div id="filters">
+            <button onclick="filterHabits('all')">All Habits</button>
+            <button onclick="filterHabits('completed')">Completed Today</button>
+            <button onclick="filterHabits('pending')">Pending Habits</button>
+        </div>
+        <ul id="habit-list"></ul>
+
+        <button id="chatbot-toggle">💬 Chat with AI</button>
+        <div id="chatbot-container" style="display: none;">
+            <div id="chatbot-header">
+                <h2>Habit Tracker AI</h2>
+                <button id="chatbot-close">&times;</button>
+            </div>
+            <div id="chatbot-messages"></div>
+            <div id="chatbot-input">
+                <input type="text" id="chatInput" placeholder="Ask me anything..." />
+                <button id="sendChat">Send</button>
+            </div>
+        </div>
+
+        <div id="loading-indicator" style="display: none;">Loading...</div>
+    </div>
 
     <script type="module" src="script.js"></script>
     <script type="module" src="biometric.js"></script>

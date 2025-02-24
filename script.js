@@ -6,28 +6,32 @@ import {
   deleteDoc,
   doc,
   updateDoc,
+  query,
+  where,
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 const habitList = document.getElementById("habit-list");
-
-// Function to fetch and display habits
 let currentFilter = "all"; // Default filter
 
+// Function to fetch and display habits for the authenticated user
 async function loadHabits() {
   habitList.innerHTML = "";
 
+  // Ensure the user is logged in
   const user = auth.currentUser;
   if (!user) {
     habitList.innerHTML = "Please log in to view your habits.";
     return;
   }
 
+  // Query habits that belong to the current user
   const habitsQuery = query(
     collection(db, "habits"),
     where("userId", "==", user.uid)
   );
 
-  const querySnapshot = await getDocs(collection(habitsQuery));
+  // Pass the query directly to getDocs()
+  const querySnapshot = await getDocs(habitsQuery);
   const today = new Date().toDateString();
 
   querySnapshot.forEach((habitDoc) => {
@@ -50,7 +54,7 @@ async function loadHabits() {
       loadHabits();
     });
 
-    // Habit Name display (will be replaced with an input when editing)
+    // Habit Name display (editable on click)
     const nameDisplay = document.createElement("span");
     nameDisplay.textContent = habit.name;
 
@@ -65,11 +69,10 @@ async function loadHabits() {
     const editBtn = document.createElement("button");
     editBtn.classList.add("edit-btn");
     editBtn.innerHTML = '<i class="fas fa-edit"></i> Edit';
-    // We'll use a flag to check if the item is in edit mode
     let isEditing = false;
     editBtn.addEventListener("click", async () => {
       if (!isEditing) {
-        // Switch to edit mode: replace the span with an input field.
+        // Switch to edit mode: replace span with input field
         const inputField = document.createElement("input");
         inputField.type = "text";
         inputField.value = nameDisplay.textContent;
@@ -78,7 +81,7 @@ async function loadHabits() {
         editBtn.innerHTML = "Save";
         isEditing = true;
       } else {
-        // Save mode: update Firebase with new name.
+        // Save mode: update habit name in Firestore
         const inputField = li.querySelector("input[type=text]");
         const newName = inputField.value.trim();
         if (newName === "") {
@@ -88,7 +91,6 @@ async function loadHabits() {
         try {
           const habitRef = doc(db, "habits", habitId);
           await updateDoc(habitRef, { name: newName });
-          // After updating, switch back to display mode.
           nameDisplay.textContent = newName;
           li.replaceChild(nameDisplay, inputField);
           editBtn.innerHTML = '<i class="fas fa-edit"></i> Edit';
@@ -99,7 +101,7 @@ async function loadHabits() {
       }
     });
 
-    // Delete Button with Font Awesome Icon
+    // Delete Button
     const deleteBtn = document.createElement("button");
     deleteBtn.classList.add("delete-btn");
     deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i> Delete';
@@ -122,7 +124,7 @@ window.filterHabits = function (type) {
   loadHabits();
 };
 
-// Function to calculate habit streak
+// Function to calculate habit streak from an array of completed dates
 function calculateStreak(completedDays = []) {
   if (!completedDays.length) return 0;
 
@@ -146,14 +148,16 @@ function calculateStreak(completedDays = []) {
   return streak;
 }
 
+// Toggle habit completion status and update Firestore
 async function toggleHabitCompletion(habitId, isChecked) {
   const habitRef = doc(db, "habits", habitId);
+  // Get the current habit data by querying the habits collection
   const habitSnapshot = await getDocs(collection(db, "habits"));
   let habitData;
 
-  habitSnapshot.forEach((doc) => {
-    if (doc.id === habitId) {
-      habitData = doc.data();
+  habitSnapshot.forEach((docSnap) => {
+    if (docSnap.id === habitId) {
+      habitData = docSnap.data();
     }
   });
 
@@ -171,6 +175,7 @@ async function toggleHabitCompletion(habitId, isChecked) {
   }
 }
 
+// Delete a habit from Firestore
 async function deleteHabit(habitId) {
   if (confirm("Are you sure you want to delete this habit?")) {
     await deleteDoc(doc(db, "habits", habitId));
@@ -178,19 +183,26 @@ async function deleteHabit(habitId) {
   }
 }
 
+// Add a new habit to Firestore, associating it with the current user
 document
   .getElementById("add-habit-form")
   .addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const habitName = document.getElementById("habit-name").value;
+    const user = auth.currentUser;
+    if (!user) {
+      alert("Please log in to add habits.");
+      return;
+    }
 
+    const habitName = document.getElementById("habit-name").value;
     if (habitName.trim() === "") return;
 
     try {
       await addDoc(collection(db, "habits"), {
         name: habitName,
         completedDays: [],
+        userId: user.uid, // Associate habit with the current user
       });
       document.getElementById("habit-name").value = "";
       loadHabits();
@@ -199,4 +211,5 @@ document
     }
   });
 
+// Load habits on startup
 loadHabits();
