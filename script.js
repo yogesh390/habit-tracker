@@ -11,37 +11,31 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 const habitList = document.getElementById("habit-list");
-let currentFilter = "all"; // Default filter
+let currentFilter = "all";
 
 auth.onAuthStateChanged((user) => {
   if (user) {
-    // User is signed in, load habits
     loadHabits();
   } else {
-    // User is signed out
     document.getElementById("app-content").style.display = "none";
     document.getElementById("login-ui").style.display = "block";
   }
 });
 
-// Function to fetch and display habits for the authenticated user
 async function loadHabits() {
   habitList.innerHTML = "";
 
-  // Ensure the user is logged in
   const user = auth.currentUser;
   if (!user) {
     habitList.innerHTML = "Please log in to view your habits.";
     return;
   }
 
-  // Query habits that belong to the current user
   const habitsQuery = query(
     collection(db, "habits"),
     where("userId", "==", user.uid)
   );
 
-  // Pass the query directly to getDocs()
   const querySnapshot = await getDocs(habitsQuery);
   const today = new Date().toDateString();
 
@@ -49,14 +43,12 @@ async function loadHabits() {
     const habit = habitDoc.data();
     const habitId = habitDoc.id;
 
-    // Filter habits based on selection
     const isCompletedToday = habit.completedDays?.includes(today);
     if (currentFilter === "completed" && !isCompletedToday) return;
     if (currentFilter === "pending" && isCompletedToday) return;
 
     const li = document.createElement("li");
 
-    // Checkbox to mark completion
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.checked = isCompletedToday;
@@ -65,25 +57,21 @@ async function loadHabits() {
       loadHabits();
     });
 
-    // Habit Name display (editable on click)
     const nameDisplay = document.createElement("span");
     nameDisplay.textContent = habit.name;
 
-    // Streak Counter with fire icon
     const streakSpan = document.createElement("span");
     streakSpan.classList.add("streak-counter");
     streakSpan.innerHTML = `<i class="fas fa-fire"></i> ${calculateStreak(
       habit.completedDays
     )}`;
 
-    // Edit Button
     const editBtn = document.createElement("button");
     editBtn.classList.add("edit-btn");
     editBtn.innerHTML = '<i class="fas fa-edit"></i> Edit';
     let isEditing = false;
     editBtn.addEventListener("click", async () => {
       if (!isEditing) {
-        // Switch to edit mode: replace span with input field
         const inputField = document.createElement("input");
         inputField.type = "text";
         inputField.value = nameDisplay.textContent;
@@ -92,7 +80,6 @@ async function loadHabits() {
         editBtn.innerHTML = "Save";
         isEditing = true;
       } else {
-        // Save mode: update habit name in Firestore
         const inputField = li.querySelector("input[type=text]");
         const newName = inputField.value.trim();
         if (newName === "") {
@@ -112,7 +99,6 @@ async function loadHabits() {
       }
     });
 
-    // Delete Button
     const deleteBtn = document.createElement("button");
     deleteBtn.classList.add("delete-btn");
     deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i> Delete';
@@ -120,7 +106,6 @@ async function loadHabits() {
       await deleteHabit(habitId);
     });
 
-    // Append elements to list item
     li.appendChild(checkbox);
     li.appendChild(nameDisplay);
     li.appendChild(streakSpan);
@@ -135,7 +120,6 @@ window.filterHabits = function (type) {
   loadHabits();
 };
 
-// Function to calculate habit streak from an array of completed dates
 function calculateStreak(completedDays = []) {
   if (!completedDays.length) return 0;
 
@@ -159,10 +143,8 @@ function calculateStreak(completedDays = []) {
   return streak;
 }
 
-// Toggle habit completion status and update Firestore
 async function toggleHabitCompletion(habitId, isChecked) {
   const habitRef = doc(db, "habits", habitId);
-  // Get the current habit data by querying the habits collection
   const habitSnapshot = await getDocs(collection(db, "habits"));
   let habitData;
 
@@ -186,7 +168,6 @@ async function toggleHabitCompletion(habitId, isChecked) {
   }
 }
 
-// Delete a habit from Firestore
 async function deleteHabit(habitId) {
   if (confirm("Are you sure you want to delete this habit?")) {
     await deleteDoc(doc(db, "habits", habitId));
@@ -194,7 +175,6 @@ async function deleteHabit(habitId) {
   }
 }
 
-// Add a new habit to Firestore, associating it with the current user
 document
   .getElementById("add-habit-form")
   .addEventListener("submit", async (e) => {
@@ -213,7 +193,7 @@ document
       await addDoc(collection(db, "habits"), {
         name: habitName,
         completedDays: [],
-        userId: user.uid, // Associate habit with the current user
+        userId: user.uid,
       });
       document.getElementById("habit-name").value = "";
       loadHabits();
@@ -222,5 +202,4 @@ document
     }
   });
 
-// Load habits on startup
 loadHabits();

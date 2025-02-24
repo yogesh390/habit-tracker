@@ -2,8 +2,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebas
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 
-//11.3.1
-
 const firebaseConfig = {
   apiKey: "AIzaSyDcbsM-EzVP3XGvjhbW1Uq3NrfFDL2dLsc",
   authDomain: "yogesh-3efb4.firebaseapp.com",
