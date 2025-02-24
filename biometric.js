@@ -1,7 +1,17 @@
-import { signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+import {
+  signInAnonymously,
+  getAuth,
+} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 import { auth } from "./firebase-config.js";
 
 export async function registerBiometric() {
+  const user = getAuth().currentUser;
+
+  if (!user) {
+    alert("You must be signed in to register biometric authentication.");
+    return;
+  }
+
   if (!window.PublicKeyCredential) {
     alert("WebAuthn API is not supported on this browser.");
     return;
@@ -11,9 +21,9 @@ export async function registerBiometric() {
     challenge: Uint8Array.from("random-challenge", (c) => c.charCodeAt(0)),
     rp: { name: "Habit Tracker" },
     user: {
-      id: Uint8Array.from("unique-user-id", (c) => c.charCodeAt(0)),
-      name: "user@example.com",
-      displayName: "User ",
+      id: Uint8Array.from(user.uid, (c) => c.charCodeAt(0)),
+      name: user.uid,
+      displayName: "Anonymous User",
     },
     pubKeyCredParams: [{ type: "public-key", alg: -7 }],
     timeout: 60000,
@@ -33,6 +43,13 @@ export async function registerBiometric() {
 }
 
 export async function authenticateBiometric() {
+  const user = getAuth().currentUser;
+
+  if (!user) {
+    alert("You must be signed in to authenticate biometric.");
+    return;
+  }
+
   if (!window.PublicKeyCredential) {
     alert("WebAuthn API is not supported on this browser.");
     return;
@@ -44,7 +61,7 @@ export async function authenticateBiometric() {
     allowCredentials: [
       {
         type: "public-key",
-        id: Uint8Array.from("credential-id", (c) => c.charCodeAt(0)),
+        id: Uint8Array.from(user.uid, (c) => c.charCodeAt(0)),
       },
     ],
     userVerification: "preferred",

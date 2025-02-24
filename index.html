@@ -29,7 +29,7 @@
             <button onclick="filterHabits('completed')">Completed Today</button>
             <button onclick="filterHabits('pending')">Pending Habits</button>
         </div>
-        <ul id="habit-list"></ul>
+        <ul id="habit-list" aria-live="polite"></ul>
 
         <button id="chatbot-toggle" aria-controls="chatbot-container">💬 Chat with AI</button>
         <div id="chatbot-container" role="dialog" style="display: none;">
@@ -37,7 +37,7 @@
                 <h2>Habit Tracker AI</h2>
                 <button id="chatbot-close">&times;</button>
             </div>
-            <div id="chatbot-messages"></div>
+            <div id="chatbot-messages" aria-live="polite"></div>
             <div id="chatbot-input">
                 <input type="text" id="chatInput" placeholder="Ask me anything..." />
                 <button id="sendChat">Send</button>
