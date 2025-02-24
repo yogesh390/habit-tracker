@@ -1,4 +1,4 @@
-import { db } from "./firebase-config.js";
+import { db, auth } from "./firebase-config.js";
 import {
   collection,
   addDoc,
@@ -16,7 +16,18 @@ let currentFilter = "all"; // Default filter
 async function loadHabits() {
   habitList.innerHTML = "";
 
-  const querySnapshot = await getDocs(collection(db, "habits"));
+  const user = auth.currentUser;
+  if (!user) {
+    habitList.innerHTML = "Please log in to view your habits.";
+    return;
+  }
+
+  const habitsQuery = query(
+    collection(db, "habits"),
+    where("userId", "==", user.uid)
+  );
+
+  const querySnapshot = await getDocs(collection(habitsQuery));
   const today = new Date().toDateString();
 
   querySnapshot.forEach((habitDoc) => {
