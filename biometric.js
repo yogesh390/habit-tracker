@@ -1,7 +1,6 @@
 import { signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-import { auth } from "./firebase-config.js"; // Import Firebase auth
+import { auth } from "./firebase-config.js";
 
-// Register a new biometric credential
 export async function registerBiometric() {
   if (!window.PublicKeyCredential) {
     alert("WebAuthn API is not supported on this browser.");
@@ -13,10 +12,10 @@ export async function registerBiometric() {
     rp: { name: "Habit Tracker" },
     user: {
       id: Uint8Array.from("unique-user-id", (c) => c.charCodeAt(0)),
-      name: "user@example.com", // Replace with dynamic user info
+      name: "user@example.com",
       displayName: "User ",
     },
-    pubKeyCredParams: [{ type: "public-key", alg: -7 }], // Using ES256
+    pubKeyCredParams: [{ type: "public-key", alg: -7 }],
     timeout: 60000,
     attestation: "none",
   };
@@ -26,7 +25,6 @@ export async function registerBiometric() {
     console.log("Credential created:", credential);
     alert("Biometric registration successful!");
 
-    // Directly log in the user after registration
     await handleSuccessfulLogin();
   } catch (error) {
     console.error("Error during biometric registration:", error);
@@ -34,7 +32,6 @@ export async function registerBiometric() {
   }
 }
 
-// Authenticate using an existing biometric credential
 export async function authenticateBiometric() {
   if (!window.PublicKeyCredential) {
     alert("WebAuthn API is not supported on this browser.");
@@ -47,7 +44,7 @@ export async function authenticateBiometric() {
     allowCredentials: [
       {
         type: "public-key",
-        id: Uint8Array.from("credential-id", (c) => c.charCodeAt(0)), // Replace with actual credential ID
+        id: Uint8Array.from("credential-id", (c) => c.charCodeAt(0)),
       },
     ],
     userVerification: "preferred",
@@ -64,14 +61,11 @@ export async function authenticateBiometric() {
   }
 }
 
-// Handle successful login
 async function handleSuccessfulLogin() {
   try {
-    // Sign in the user anonymously
     const userCredential = await signInAnonymously(auth);
     console.log("User signed in anonymously:", userCredential.user);
 
-    // Show app content and hide login UI
     document.getElementById("app-content").style.display = "block";
     document.getElementById("login-ui").style.display = "none";
   } catch (error) {
@@ -80,7 +74,6 @@ async function handleSuccessfulLogin() {
   }
 }
 
-// Wire up the buttons to the respective functions
 document
   .getElementById("register-biometric")
   .addEventListener("click", registerBiometric);
