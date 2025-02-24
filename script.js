@@ -6,57 +6,31 @@ import {
   deleteDoc,
   doc,
   updateDoc,
-  query,
-  where,
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-
-import { auth } from "./firebase-config.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 
 const habitList = document.getElementById("habit-list");
 
-let currentFilter = "all";
-let currentUser = null; // Store the authenticated user
+// Function to fetch and display habits
+let currentFilter = "all"; // Default filter
 
-// Check if user is logged in
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    currentUser = user;
-    console.log("User logged in:", user.uid);
-    loadHabits();
-  } else {
-    currentUser = null;
-    console.log("No user logged in");
-    habitList.innerHTML = "<p>Please log in to see your habits.</p>";
-  }
-});
-
-// Load habits for the logged-in user
 async function loadHabits() {
-  if (!currentUser) {
-    habitList.innerHTML = "<p>Please log in to see your habits.</p>";
-    return;
-  }
-
   habitList.innerHTML = "";
 
-  const habitsRef = collection(db, "habits");
-  const q = query(habitsRef, where("userId", "==", currentUser.uid));
-  const querySnapshot = await getDocs(q);
-
+  const querySnapshot = await getDocs(collection(db, "habits"));
   const today = new Date().toDateString();
 
   querySnapshot.forEach((habitDoc) => {
     const habit = habitDoc.data();
     const habitId = habitDoc.id;
 
+    // Filter habits based on selection
     const isCompletedToday = habit.completedDays?.includes(today);
     if (currentFilter === "completed" && !isCompletedToday) return;
     if (currentFilter === "pending" && isCompletedToday) return;
 
     const li = document.createElement("li");
 
-    // Checkbox for marking completion
+    // Checkbox to mark completion
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.checked = isCompletedToday;
@@ -65,9 +39,11 @@ async function loadHabits() {
       loadHabits();
     });
 
+    // Habit Name display (will be replaced with an input when editing)
     const nameDisplay = document.createElement("span");
     nameDisplay.textContent = habit.name;
 
+    // Streak Counter with fire icon
     const streakSpan = document.createElement("span");
     streakSpan.classList.add("streak-counter");
     streakSpan.innerHTML = `<i class="fas fa-fire"></i> ${calculateStreak(
@@ -78,9 +54,11 @@ async function loadHabits() {
     const editBtn = document.createElement("button");
     editBtn.classList.add("edit-btn");
     editBtn.innerHTML = '<i class="fas fa-edit"></i> Edit';
+    // We'll use a flag to check if the item is in edit mode
     let isEditing = false;
     editBtn.addEventListener("click", async () => {
       if (!isEditing) {
+        // Switch to edit mode: replace the span with an input field.
         const inputField = document.createElement("input");
         inputField.type = "text";
         inputField.value = nameDisplay.textContent;
@@ -89,6 +67,7 @@ async function loadHabits() {
         editBtn.innerHTML = "Save";
         isEditing = true;
       } else {
+        // Save mode: update Firebase with new name.
         const inputField = li.querySelector("input[type=text]");
         const newName = inputField.value.trim();
         if (newName === "") {
@@ -96,7 +75,9 @@ async function loadHabits() {
           return;
         }
         try {
-          await updateDoc(doc(db, "habits", habitId), { name: newName });
+          const habitRef = doc(db, "habits", habitId);
+          await updateDoc(habitRef, { name: newName });
+          // After updating, switch back to display mode.
           nameDisplay.textContent = newName;
           li.replaceChild(nameDisplay, inputField);
           editBtn.innerHTML = '<i class="fas fa-edit"></i> Edit';
@@ -107,7 +88,7 @@ async function loadHabits() {
       }
     });
 
-    // Delete Button
+    // Delete Button with Font Awesome Icon
     const deleteBtn = document.createElement("button");
     deleteBtn.classList.add("delete-btn");
     deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i> Delete';
@@ -115,7 +96,7 @@ async function loadHabits() {
       await deleteHabit(habitId);
     });
 
-    // Append elements
+    // Append elements to list item
     li.appendChild(checkbox);
     li.appendChild(nameDisplay);
     li.appendChild(streakSpan);
@@ -130,11 +111,32 @@ window.filterHabits = function (type) {
   loadHabits();
 };
 
-// Update habit completion
+// Function to calculate habit streak
+function calculateStreak(completedDays = []) {
+  if (!completedDays.length) return 0;
+
+  const sortedDates = completedDays
+    .map((date) => new Date(date).getTime())
+    .sort((a, b) => b - a);
+  let streak = 1;
+  let prevDate = new Date(sortedDates[0]);
+
+  for (let i = 1; i < sortedDates.length; i++) {
+    let currentDate = new Date(sortedDates[i]);
+    let diff = (prevDate - currentDate) / (1000 * 60 * 60 * 24);
+
+    if (diff === 1) {
+      streak++;
+      prevDate = currentDate;
+    } else {
+      break;
+    }
+  }
+  return streak;
+}
+
 async function toggleHabitCompletion(habitId, isChecked) {
   const habitRef = doc(db, "habits", habitId);
-  const today = new Date().toDateString();
-
   const habitSnapshot = await getDocs(collection(db, "habits"));
   let habitData;
 
@@ -146,16 +148,18 @@ async function toggleHabitCompletion(habitId, isChecked) {
 
   if (habitData) {
     let completedDays = habitData.completedDays || [];
+    const today = new Date().toDateString();
+
     if (isChecked) {
       completedDays.push(today);
     } else {
       completedDays = completedDays.filter((day) => day !== today);
     }
+
     await updateDoc(habitRef, { completedDays });
   }
 }
 
-// Delete Habit
 async function deleteHabit(habitId) {
   if (confirm("Are you sure you want to delete this habit?")) {
     await deleteDoc(doc(db, "habits", habitId));
@@ -163,16 +167,10 @@ async function deleteHabit(habitId) {
   }
 }
 
-// Add Habit
 document
   .getElementById("add-habit-form")
   .addEventListener("submit", async (e) => {
     e.preventDefault();
-
-    if (!currentUser) {
-      alert("You must be logged in to add a habit.");
-      return;
-    }
 
     const habitName = document.getElementById("habit-name").value;
 
@@ -182,7 +180,6 @@ document
       await addDoc(collection(db, "habits"), {
         name: habitName,
         completedDays: [],
-        userId: currentUser.uid, // Associate habit with logged-in user
       });
       document.getElementById("habit-name").value = "";
       loadHabits();
