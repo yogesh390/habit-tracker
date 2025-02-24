@@ -77,7 +77,6 @@ button:hover {
   text-decoration: line-through;
 }
 
-/* Delete Button */
 button.delete-btn {
   background: none;
   border: none;
@@ -99,7 +98,6 @@ button.delete-btn i {
   margin-right: 5px;
 }
 
-/* Streak Counter */
 .streak-counter {
   color: #ff5722;
   font-size: 18px;
@@ -116,7 +114,6 @@ button.delete-btn i {
   margin-right: 5px;
 }
 
-/* Chatbot container styling */
 #chatbot-container {
   position: fixed;
   bottom: 20px;
@@ -130,7 +127,6 @@ button.delete-btn i {
   flex-direction: column;
 }
 
-/* Chatbot header styling */
 #chatbot-header {
   background: var(--primary-color);
   color: white;
@@ -142,7 +138,6 @@ button.delete-btn i {
   border-top-right-radius: 10px;
 }
 
-/* Chat messages area */
 #chatbot-messages {
   max-height: 200px;
   overflow-y: auto;
@@ -150,7 +145,6 @@ button.delete-btn i {
   background: #fff;
 }
 
-/* Chat input area */
 #chatbot-input {
   display: flex;
   border-top: 1px solid #ddd;
@@ -172,7 +166,6 @@ button.delete-btn i {
   border-bottom-right-radius: 10px;
 }
 
-/* Chatbot toggle button */
 #chatbot-toggle {
   position: fixed;
   bottom: 20px;
@@ -185,7 +178,6 @@ button.delete-btn i {
   cursor: pointer;
 }
 
-/* Biometric buttons styling (optional) */
 #register-biometric,
 #authenticate-biometric {
   margin: 10px;
