@@ -11,8 +11,9 @@
 
 <body>
     <div id="login-ui">
-        <button id="register-biometric">Register Biometric</button>
-        <button id="authenticate-biometric">Login with Biometric</button>
+        <button id="register-biometric" aria-label="Register your biometric data for login">Register Biometric</button>
+        <button id="authenticate-biometric" aria-label="Authenticate with your biometric data">Login with
+            Biometric</button>
     </div>
 
     <div id="app-content" style="display: none;">
@@ -30,8 +31,8 @@
         </div>
         <ul id="habit-list"></ul>
 
-        <button id="chatbot-toggle">💬 Chat with AI</button>
-        <div id="chatbot-container" style="display: none;">
+        <button id="chatbot-toggle" aria-controls="chatbot-container">💬 Chat with AI</button>
+        <div id="chatbot-container" role="dialog" style="display: none;">
             <div id="chatbot-header">
                 <h2>Habit Tracker AI</h2>
                 <button id="chatbot-close">&times;</button>
