@@ -1,4 +1,5 @@
-// biometric.js
+import { signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+import { auth } from "./firebase-config.js"; // Import Firebase auth
 
 // Register a new biometric credential
 export async function registerBiometric() {
@@ -26,7 +27,7 @@ export async function registerBiometric() {
     alert("Biometric registration successful!");
 
     // Directly log in the user after registration
-    handleSuccessfulLogin();
+    await handleSuccessfulLogin();
   } catch (error) {
     console.error("Error during biometric registration:", error);
     alert("Biometric registration failed.");
@@ -46,7 +47,7 @@ export async function authenticateBiometric() {
     allowCredentials: [
       {
         type: "public-key",
-        id: Uint8Array.from("credential-id", (c) => c.charCodeAt(0)),
+        id: Uint8Array.from("credential-id", (c) => c.charCodeAt(0)), // Replace with actual credential ID
       },
     ],
     userVerification: "preferred",
@@ -56,7 +57,7 @@ export async function authenticateBiometric() {
     const assertion = await navigator.credentials.get({ publicKey });
     console.log("Assertion received:", assertion);
     alert("Biometric authentication successful!");
-    handleSuccessfulLogin();
+    await handleSuccessfulLogin();
   } catch (error) {
     console.error("Error during biometric authentication:", error);
     alert("Biometric authentication failed.");
@@ -64,10 +65,19 @@ export async function authenticateBiometric() {
 }
 
 // Handle successful login
-function handleSuccessfulLogin() {
-  document.getElementById("app-content").style.display = "block";
-  document.getElementById("login-ui").style.display = "none";
-  // Optionally, integrate with Firebase Authentication here.
+async function handleSuccessfulLogin() {
+  try {
+    // Sign in the user anonymously
+    const userCredential = await signInAnonymously(auth);
+    console.log("User signed in anonymously:", userCredential.user);
+
+    // Show app content and hide login UI
+    document.getElementById("app-content").style.display = "block";
+    document.getElementById("login-ui").style.display = "none";
+  } catch (error) {
+    console.error("Error signing in anonymously:", error);
+    alert("Authentication failed. Please try again.");
+  }
 }
 
 // Wire up the buttons to the respective functions
