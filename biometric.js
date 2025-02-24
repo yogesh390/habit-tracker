@@ -13,7 +13,7 @@ export async function registerBiometric() {
     rp: { name: "Habit Tracker" },
     user: {
       id: Uint8Array.from("unique-user-id", (c) => c.charCodeAt(0)),
-      name: "user@example.com", // Replace with the user's email or username
+      name: "user@example.com", // Replace with dynamic user info
       displayName: "User",
     },
     pubKeyCredParams: [{ type: "public-key", alg: -7 }], // Using ES256
@@ -25,7 +25,10 @@ export async function registerBiometric() {
     const credential = await navigator.credentials.create({ publicKey });
     console.log("Credential created:", credential);
     alert("Biometric registration successful!");
-    // Send the credential to your server for verification/storage here.
+    // In a real application, send the credential to your server for verification/storage.
+
+    // Auto-login after successful registration (mimicking "continue with Google")
+    await authenticateBiometric();
   } catch (error) {
     console.error("Error during biometric registration:", error);
     alert("Biometric registration failed.");
@@ -58,10 +61,20 @@ export async function authenticateBiometric() {
     console.log("Assertion received:", assertion);
     alert("Biometric authentication successful!");
     // Send the assertion to your server for verification here.
+    // On successful verification, update the application state to "logged in":
+    handleSuccessfulLogin();
   } catch (error) {
     console.error("Error during biometric authentication:", error);
     alert("Biometric authentication failed.");
   }
+}
+
+// Handle successful login, e.g., update UI or trigger Firebase sign-in
+function handleSuccessfulLogin() {
+  // Example: hide the login/register UI and display the main app content.
+  document.getElementById("app-content").style.display = "block";
+  document.getElementById("login-ui").style.display = "none";
+  // Optionally, integrate with Firebase Authentication here.
 }
 
 // Wire up the buttons to the respective functions
