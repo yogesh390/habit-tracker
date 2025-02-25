@@ -5,11 +5,19 @@ import {
 import { auth } from "./firebase-config.js";
 
 export async function registerBiometric() {
-  const user = getAuth().currentUser;
+  let user = auth.currentUser;
 
   if (!user) {
-    alert("You must be signed in to register biometric authentication.");
-    return;
+    console.log("User not signed in, signing in anonymously...");
+    try {
+      const userCredential = await signInAnonymously(auth);
+      user = userCredential.user;
+      console.log("Signed in as:", user.uid);
+    } catch (error) {
+      console.error("Anonymous sign-in failed:", error);
+      alert("Sign-in required before registering biometrics.");
+      return;
+    }
   }
 
   if (!window.PublicKeyCredential) {
@@ -43,11 +51,19 @@ export async function registerBiometric() {
 }
 
 export async function authenticateBiometric() {
-  const user = getAuth().currentUser;
+  let user = auth.currentUser;
 
   if (!user) {
-    alert("You must be signed in to authenticate biometric.");
-    return;
+    console.log("User not signed in, signing in anonymously...");
+    try {
+      const userCredential = await signInAnonymously(auth);
+      user = userCredential.user;
+      console.log("Signed in as:", user.uid);
+    } catch (error) {
+      console.error("Anonymous sign-in failed:", error);
+      alert("Sign-in required before biometric authentication.");
+      return;
+    }
   }
 
   if (!window.PublicKeyCredential) {

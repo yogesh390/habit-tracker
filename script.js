@@ -117,7 +117,8 @@ async function loadHabits() {
 
 window.filterHabits = function (type) {
   currentFilter = type;
-  loadHabits();
+  loadHabits(); // const nameDisplay = document.createElement("span");
+  // nameDisplay.textContent = habit.name;
 };
 
 function calculateStreak(completedDays = []) {
